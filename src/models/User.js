@@ -10,6 +10,12 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+    },
     username: {
       type: String,
       required: true,
@@ -20,15 +26,9 @@ const schema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-    },
     role: {
       type: String,
-      enum: ["admin", "customer"],
+      enum: ["admin", "user"],
       immutable: true,
     },
   },
