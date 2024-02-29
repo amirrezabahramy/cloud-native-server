@@ -5,10 +5,11 @@ const User = require("../../models/User");
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, username, password, role } = req.body;
+    const { firstName, lastName, email, username, password, role } = req.body;
     const customer = new User({
       firstName,
       lastName,
+      email,
       username,
       password: await hash(password),
       role,
