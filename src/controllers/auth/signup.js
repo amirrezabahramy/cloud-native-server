@@ -1,5 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
-const hash = require("../../services/hash");
+const { hash } = require("../../services/hash");
 
 const User = require("../../models/User");
 
