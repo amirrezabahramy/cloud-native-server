@@ -10,7 +10,7 @@ exports.login = async (req, res) => {
   const [user] = await User.find({ username });
 
   if (!user) {
-    return res.status(StatusCodes.NOT_FOUND).send("User not found");
+    return res.status(StatusCodes.BAD_REQUEST).send("User not found");
   }
 
   if (!(await bcrypt.compare(password, user.password))) {
