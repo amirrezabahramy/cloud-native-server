@@ -17,17 +17,19 @@ const verifyToken = (token, callback) => {
   });
 };
 
-exports.authenticateByRole = (roles) => (req, res, next) => {
-  const token = extractTokenFromRequest(req);
-  verifyToken(token, (user) => {
-    if (!roles.includes(user.role)) {
-      return res
-        .status(StatusCodes.FORBIDDEN)
-        .send("You are not allowed to access this route.");
-    }
-    next();
-  });
-};
+exports.authenticateByRole =
+  (...roles) =>
+  (req, res, next) => {
+    const token = extractTokenFromRequest(req);
+    verifyToken(token, (user) => {
+      if (!roles.includes(user.role)) {
+        return res
+          .status(StatusCodes.FORBIDDEN)
+          .send("You are not allowed to access this route.");
+      }
+      next();
+    });
+  };
 
 exports.authenticateById = (key) => (req, res, next) => {
   const token = extractTokenFromRequest(req);
