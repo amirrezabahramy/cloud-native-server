@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const { StatusCodes } = require("http-status-codes");
 
 const User = require("../../models/User");
+const Schedule = require("../../models/Schedule");
 const { generateAccessToken } = require("../../services/auth");
 
 exports.login = async (req, res) => {
@@ -10,7 +11,24 @@ exports.login = async (req, res) => {
   const [user] = await User.find({ username });
 
   if (!user) {
-    return res.status(StatusCodes.BAD_REQUEST).send("User not found");
+    return res
+      .status(StatusCodes.UNAUTHORIZED)
+      .send("Username or password is incorrect.");
+  }
+
+  let fullAccess = false;
+  const schedule = await Schedule.findOne({ user: user._id });
+
+  if (schedule) {
+    if (
+      Date.now() > schedule.toDate.getTime() ||
+      Date.now() < schedule.fromDate.getTime()
+    ) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .send("You are not allowed to login in this time period.");
+    }
+    fullAccess = true;
   }
 
   if (!(await bcrypt.compare(password, user.password))) {
@@ -19,6 +37,15 @@ exports.login = async (req, res) => {
       .send("Username or password is incorrect.");
   }
 
-  const accessToken = generateAccessToken(user.toObject());
+  const accessTokenObject = schedule
+    ? {
+        ...user.toObject(),
+        fromDate: schedule.fromDate,
+        toDate: schedule.toDate,
+        fullAccess,
+      }
+    : { ...user.toObject(), fullAccess };
+
+  const accessToken = generateAccessToken(accessTokenObject);
   res.status(StatusCodes.OK).send({ accessToken });
 };
