@@ -4,7 +4,7 @@ const { verifyToken: verifyTokenService } = require("../services/auth");
 const extractTokenFromRequest = (req) =>
   req.headers["authorization"].split(" ")[1] || "";
 
-const verifyToken = (token, callback) => {
+const verifyToken = (res, token, callback) => {
   if (!token) {
     return res.status(StatusCodes.UNAUTHORIZED).send("No token found.");
   }
@@ -21,7 +21,7 @@ exports.authenticateByRole =
   (...roles) =>
   (req, res, next) => {
     const token = extractTokenFromRequest(req);
-    verifyToken(token, (user) => {
+    verifyToken(res, token, (user) => {
       if (!roles.includes(user.role)) {
         return res
           .status(StatusCodes.FORBIDDEN)
@@ -33,7 +33,7 @@ exports.authenticateByRole =
 
 exports.authenticateById = (key) => (req, res, next) => {
   const token = extractTokenFromRequest(req);
-  verifyToken(token, (user) => {
+  verifyToken(res, token, (user) => {
     if (!user._id === req.params[key]) {
       return res
         .status(StatusCodes.FORBIDDEN)
