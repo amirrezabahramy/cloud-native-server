@@ -16,7 +16,7 @@ exports.login = async (req, res) => {
       .send("Username or password is incorrect.");
   }
 
-  let fullAccess = false;
+  let fullAccess = "first-login";
   const schedule = await Schedule.findOne({ user: user._id });
 
   if (schedule) {
@@ -24,11 +24,13 @@ exports.login = async (req, res) => {
       Date.now() > schedule.toDate.getTime() ||
       Date.now() < schedule.fromDate.getTime()
     ) {
-      return res
-        .status(StatusCodes.FORBIDDEN)
-        .send("You are not allowed to login in this time period.");
+      // return res
+      //   .status(StatusCodes.FORBIDDEN)
+      //   .send("You are not allowed to login in this time period.");
+      fullAccess = false;
+    } else {
+      fullAccess = true;
     }
-    fullAccess = true;
   }
 
   if (!(await bcrypt.compare(password, user.password))) {
