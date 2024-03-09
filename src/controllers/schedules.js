@@ -60,19 +60,29 @@ exports.getSchedule = async function (req, res) {
       return res.status(StatusCodes.UNAUTHORIZED).send("Token not found.");
     }
 
-    verifyToken(token, (error, userFromToken) => {
+    let schedule = await Schedule.findOne({ _id: req.params.scheduleId });
+
+    verifyToken(token, async (error, userFromToken) => {
       if (error) {
         return res.status(StatusCodes.UNAUTHORIZED).send("Token is not valid.");
       }
 
-      if (user.role !== "admin" && userFromToken._id !== user) {
-        return res
-          .status(StatusCodes.FORBIDDEN)
-          .send("You are not allowed to modify other users schedules.");
+      console.log(userFromToken._id === schedule.user._id.toString());
+
+      if (
+        userFromToken.role !== "admin" &&
+        userFromToken._id !== schedule?.user._id.toString()
+      ) {
+        schedule = undefined;
       }
     });
+    console.log(schedule);
 
-    const schedule = await Schedule.findOne({ _id: req.params.id });
+    if (!schedule) {
+      return res
+        .status(StatusCodes.FORBIDDEN)
+        .send("You are not allowed to get other users schedules.");
+    }
 
     res.status(StatusCodes.OK).send(schedule);
   } catch (error) {
