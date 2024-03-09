@@ -5,14 +5,14 @@ const User = require("../../models/User");
 
 exports.signup = async (req, res) => {
   try {
-    const { firstName, lastName, email, username, password } = req.body;
+    const { firstName, lastName, email, username, password, role } = req.body;
     const user = new User({
       firstName,
       lastName,
       email,
       username,
       password: await hash(password),
-      role: "user",
+      role,
     });
     await user.save();
     res.status(StatusCodes.CREATED).send(user);
