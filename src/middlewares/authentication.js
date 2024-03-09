@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const { verifyToken: verifyTokenService } = require("../services/auth");
 
 const extractTokenFromRequest = (req) =>
-  req.headers["authorization"].split(" ")[1] || "";
+  req.headers["authorization"]?.split(" ")[1] || "";
 
 const verifyToken = (res, token, callback) => {
   if (!token) {
